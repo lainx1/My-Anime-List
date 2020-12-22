@@ -7,7 +7,7 @@ data class Anime(
     val airing: Boolean,
     val episodes: Int,
     val rating: String?,
-    val scored: Int?,
+    val score: Double?,
     val synopsis: String,
     val genres: List<Genre>?,
     val title: String,
