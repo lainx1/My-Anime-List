@@ -41,9 +41,9 @@ class AnimeViewModel : ViewModel(){
 //
 //            }catch (e: Exception){}
         }
-    fun searchAnime(q: String){
+    fun searchAnime(q: String,page: Int, limit: Int){
         viewModelScope.launch (Dispatchers.IO){
-            val search = AnimeRetrofitClient.retrofitClient.searchAnime( q= q)
+            val search = AnimeRetrofitClient.retrofitClient.searchAnime( q= q, page=page, limit = limit)
             search?.let {
                 withContext(Dispatchers.Main){
                     _search.value = it

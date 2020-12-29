@@ -13,5 +13,9 @@ interface AnimeRepository {
     suspend fun findAnimeByid(@Path("id")id: Int): Anime
 
     @GET(value = "search/anime")
-    suspend fun searchAnime(@Query(value = "q") q:String): Search
+    suspend fun searchAnime(
+            @Query(value = "q") q:String,
+            @Query(value = "page") page:Int = 1,
+             @Query(value = "limit") limit:Int = 10
+    ): Search
 }
