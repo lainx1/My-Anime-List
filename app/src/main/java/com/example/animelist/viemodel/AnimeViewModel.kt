@@ -7,8 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.animelist.model.Anime
 import com.example.animelist.model.Search
 import com.example.animelist.network.AnimeRetrofitClient
+import com.example.animelist.network.enums.AnimeOrder
+import com.example.animelist.network.enums.AnimeSort
+import com.example.animelist.network.utils.AnimeFilterAndSort
 import kotlinx.coroutines.*
 import java.lang.Exception
+import java.nio.ByteOrder
 
 enum class RequestStatus {ERROR, LOADING, DONE}
 
@@ -41,9 +45,9 @@ class AnimeViewModel : ViewModel(){
 //
 //            }catch (e: Exception){}
         }
-    fun searchAnime(q: String,page: Int, limit: Int){
+    fun searchAnime(q:  String = "", page: Int, limit: Int = 20, order_by: String = AnimeFilterAndSort.animeOrder[AnimeOrder.TITLE]!!, sort: String = AnimeFilterAndSort.animeSort[AnimeSort.ASC]!!){
         viewModelScope.launch (Dispatchers.IO){
-            val search = AnimeRetrofitClient.retrofitClient.searchAnime( q= q, page=page, limit = limit)
+            val search = AnimeRetrofitClient.retrofitClient.searchAnime( q= q, page=page, limit = limit,order_by = order_by,sort = sort)
             search?.let {
                 withContext(Dispatchers.Main){
                     _search.value = it

@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), NestedScrollView.OnScrollChangeListener {
 
-    private val LIMIT = 20
+
     private var animeViewModel: AnimeViewModel? = null
     private var PAGE = 1
 
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), NestedScrollView.OnScrollChangeListene
             ///
         })
 
-        animeViewModel!!.searchAnime(q = "utawareumono" , page = PAGE, limit = LIMIT)
+        animeViewModel!!.searchAnime( page = PAGE)
     }
 
     override fun onStart() {
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity(), NestedScrollView.OnScrollChangeListene
     override fun onScrollChange(v: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
         if (scrollY == v!!.getChildAt(0).measuredHeight - v.measuredHeight){
             PAGE++
-            animeViewModel!!.searchAnime(q = "utawareumono" , page = PAGE, limit = LIMIT)
+            animeViewModel!!.searchAnime(  page = PAGE)
 
         }
 
