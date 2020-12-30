@@ -50,4 +50,9 @@ class AnimeAdapter(private val animes: MutableList<Anime>):RecyclerView.Adapter<
         this.animes.addAll(animes)
         notifyDataSetChanged()
     }
+
+    fun clearAnimes(){
+        this.animes.clear()
+        notifyDataSetChanged()
+    }
 }
