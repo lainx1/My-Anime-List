@@ -7,6 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.animelist.model.Anime
 import com.example.animelist.model.Search
 import com.example.animelist.network.AnimeRetrofitClient
+import com.example.animelist.network.enums.AnimeOrder
+import com.example.animelist.network.enums.AnimeSort
+import com.example.animelist.network.utils.AnimeFilterAndSort
 import kotlinx.coroutines.*
 import java.lang.Exception
 
@@ -33,17 +36,11 @@ class AnimeViewModel : ViewModel(){
                 }
             }
         }
-        //coroutineScope.launch {
-//            val animeDeferret = AnimeRetrofitClient.retrofitClient.findAnimeByid(id = id)
-//            try {
-//                val anime = animeDeferret.await()
-//                _anime.value = anime
-//
-//            }catch (e: Exception){}
-        }
-    fun searchAnime(q: String){
+    }
+
+    fun searchAnime(q: String = "", page: Int, limit: Int = 20, orderBy: String = AnimeFilterAndSort.animeOrder[AnimeOrder.TITLE]!!, sort: String = AnimeFilterAndSort.animeSort[AnimeSort.ASC]!!){
         viewModelScope.launch (Dispatchers.IO){
-            val search = AnimeRetrofitClient.retrofitClient.searchAnime( q= q)
+            val search = AnimeRetrofitClient.retrofitClient.searchAnime( q = q, page = page, limit = limit, orderBy = orderBy, sort = sort)
             search?.let {
                 withContext(Dispatchers.Main){
                     _search.value = it

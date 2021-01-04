@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.example.animelist.R
 import com.example.animelist.model.Anime
 
-class AnimeAdapter(private val animes: List<Anime>):RecyclerView.Adapter<AnimeAdapter.AnimeViewHolder>() {
+class AnimeAdapter(private val animes: MutableList<Anime>):RecyclerView.Adapter<AnimeAdapter.AnimeViewHolder>() {
 
     /// ViewHolder
     class AnimeViewHolder(view:View):RecyclerView.ViewHolder(view)
@@ -41,4 +41,17 @@ class AnimeAdapter(private val animes: List<Anime>):RecyclerView.Adapter<AnimeAd
     }
 
     override fun getItemCount(): Int = animes.size
+
+    /*==============================================================================================
+    PUBLIC METHODS
+    ==============================================================================================*/
+    fun addAnimes(animes: List<Anime>) {
+        this.animes.addAll(animes)
+        notifyDataSetChanged()
+    }
+
+    fun clearAnimes(){
+        this.animes.clear()
+        notifyDataSetChanged()
+    }
 }
