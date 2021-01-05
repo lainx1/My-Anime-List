@@ -40,7 +40,7 @@ object AnimeRetrofitClient {
 //        .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .addCallAdapterFactory(EitherCallAdapterFactory())
             .baseUrl(BASE_URL)
-            .client(okHttpInterceptorClient)
+            //.client(okHttpInterceptorClient)
             .build()
 
     val retrofitClient : AnimeRepository by lazy {

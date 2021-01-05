@@ -38,17 +38,15 @@ class AnimeViewModel : ViewModel(){
         viewModelScope.launch (Dispatchers.IO){
             val either = AnimeRetrofitClient.retrofitClient.findAnimeByid(id = id)
 
-            either?.let {
-                withContext(Dispatchers.Main){
-                    either.fold(
+            withContext(Dispatchers.Main){
+                either.fold(
                         {
                             _error.value = it
                         },
                         {
                             _anime.value = it
                         }
-                    )
-                }
+                )
             }
         }
     }
@@ -57,17 +55,15 @@ class AnimeViewModel : ViewModel(){
         Timber.i("Buscando anime")
         viewModelScope.launch (Dispatchers.IO){
             val either = AnimeRetrofitClient.retrofitClient.searchAnime( q = q, page = page, limit = limit, orderBy = orderBy, sort = sort)
-            either?.let {
-                withContext(Dispatchers.Main){
-                    either.fold(
+            withContext(Dispatchers.Main){
+                either.fold(
                         {
                             _error.value = it
                         },
                         {
                             _search.value = it
                         }
-                    )
-                }
+                )
             }
         }
     }
