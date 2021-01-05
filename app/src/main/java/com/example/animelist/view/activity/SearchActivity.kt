@@ -44,6 +44,11 @@ class SearchActivity : AppCompatActivity(), SearchView.OnQueryTextListener, Nest
             animeAdapter.addAnimes(it.results)
         })
 
+
+        animeViewModel!!.error.observe(this, {
+            Toast.makeText(this@SearchActivity, "Hubo un error $it-", Toast.LENGTH_SHORT).show()
+        })
+
         handleIntent(intent)
     }
 

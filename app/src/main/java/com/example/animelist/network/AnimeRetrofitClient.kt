@@ -1,5 +1,6 @@
 package com.example.animelist.network
 
+import com.example.animelist.network.converters.EitherCallAdapterFactory
 import com.example.animelist.network.enums.StatusCode
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -37,6 +38,7 @@ object AnimeRetrofitClient {
     private val retrofit = Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
 //        .addCallAdapterFactory(CoroutineCallAdapterFactory())
+            .addCallAdapterFactory(EitherCallAdapterFactory())
             .baseUrl(BASE_URL)
             .client(okHttpInterceptorClient)
             .build()

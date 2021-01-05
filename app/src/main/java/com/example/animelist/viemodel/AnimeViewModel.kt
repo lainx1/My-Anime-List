@@ -9,8 +9,10 @@ import com.example.animelist.model.Search
 import com.example.animelist.network.AnimeRetrofitClient
 import com.example.animelist.network.enums.AnimeOrder
 import com.example.animelist.network.enums.AnimeSort
+import com.example.animelist.network.model.ApiError
 import com.example.animelist.network.utils.AnimeFilterAndSort
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.lang.Exception
 
 enum class RequestStatus {ERROR, LOADING, DONE}
@@ -27,25 +29,45 @@ class AnimeViewModel : ViewModel(){
     private val _search = MutableLiveData<Search>()
     val search : LiveData<Search> get() = _search
 
+    private val _error = MutableLiveData<ApiError>()
+    val error: LiveData<ApiError> get() = _error
+
     fun findAnimeByid(id: Int){
+
+
         viewModelScope.launch (Dispatchers.IO){
-            val anime = AnimeRetrofitClient.retrofitClient.findAnimeByid(id = id)
-            anime?.let {
+            val either = AnimeRetrofitClient.retrofitClient.findAnimeByid(id = id)
+
+            either?.let {
                 withContext(Dispatchers.Main){
-                    _anime.value = it
+                    either.fold(
+                        {
+                            _error.value = it
+                        },
+                        {
+                            _anime.value = it
+                        }
+                    )
                 }
             }
         }
     }
 
     fun searchAnime(q: String = "", page: Int, limit: Int = 20, orderBy: String = AnimeFilterAndSort.animeOrder[AnimeOrder.TITLE]!!, sort: String = AnimeFilterAndSort.animeSort[AnimeSort.ASC]!!){
+        Timber.i("Buscando anime")
         viewModelScope.launch (Dispatchers.IO){
-            val search = AnimeRetrofitClient.retrofitClient.searchAnime( q = q, page = page, limit = limit, orderBy = orderBy, sort = sort)
-            search?.let {
+            val either = AnimeRetrofitClient.retrofitClient.searchAnime( q = q, page = page, limit = limit, orderBy = orderBy, sort = sort)
+            either?.let {
                 withContext(Dispatchers.Main){
-                    _search.value = it
+                    either.fold(
+                        {
+                            _error.value = it
+                        },
+                        {
+                            _search.value = it
+                        }
+                    )
                 }
-
             }
         }
     }
