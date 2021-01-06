@@ -42,10 +42,9 @@ class AnimeAdapter(private val animes: MutableList<Anime>):RecyclerView.Adapter<
 
     override fun getItemCount(): Int = animes.size
 
-    /*?======================================================================================
-    Public methods
-    * ========================================================================================*/
-
+    /*==============================================================================================
+    PUBLIC METHODS
+    ==============================================================================================*/
     fun addAnimes(animes: List<Anime>) {
         this.animes.addAll(animes)
         notifyDataSetChanged()

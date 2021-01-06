@@ -14,17 +14,20 @@ import com.example.animelist.R
 import com.example.animelist.viemodel.AnimeViewModel
 import com.example.animelist.view.AnimeAdapter
 import kotlinx.android.synthetic.main.activity_main.*
-
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.activity_search.scrollView
+import kotlinx.android.synthetic.main.loader.*
 
-class SearchActivity : AppCompatActivity(),SearchView.OnQueryTextListener, NestedScrollView.OnScrollChangeListener {
+class SearchActivity : BaseActivity(), SearchView.OnQueryTextListener, NestedScrollView.OnScrollChangeListener {
 
-    private var animeViewModel: AnimeViewModel? = null
     private var PAGE = 1
+    private var animeViewModel: AnimeViewModel? = null
     private var query = ""
-    private val animeAdapter = AnimeAdapter(animes = mutableListOf())
+    private val animeAdapter = AnimeAdapter(animes =  mutableListOf())
 
+    /*==============================================================================================
+    ACTIVITY METHODS
+    ==============================================================================================*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +35,7 @@ class SearchActivity : AppCompatActivity(),SearchView.OnQueryTextListener, Neste
 
         animeViewModel = AnimeViewModel()
 
-        with(animeResultListRV) {
+        with(animeResultListRv){
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(this@SearchActivity, 2, GridLayoutManager.VERTICAL, false)
             adapter = animeAdapter
@@ -40,91 +43,100 @@ class SearchActivity : AppCompatActivity(),SearchView.OnQueryTextListener, Neste
 
         animeViewModel!!.search.observe(this, {
             animeAdapter.addAnimes(it.results)
-            ///
         })
+
+
+        animeViewModel!!.error.observe(this, {
+            handleApiError(error = it)
+        })
+
+        animeViewModel!!.loading.observe(this, {
+            showloader(loader = loader, loading = it )
+        })
+
 
         handleIntent(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.options_menu,menu)
 
-        val searchView =  (menu!!.findItem(R.id.search).actionView as SearchView)
+        menuInflater.inflate(R.menu.options_menu, menu)
 
-        //Asocia al menu de busqueda
+        // Associate searchable configuration with the SearchView
+        val searchView = (menu!!.findItem(R.id.search).actionView as SearchView)
+
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
 
-       searchView.apply {
+        searchView.apply {
             setSearchableInfo(searchManager.getSearchableInfo(componentName))
-           isIconifiedByDefault = false
-           requestFocus()
-           setOnQueryTextListener(this@SearchActivity)
+            isIconifiedByDefault = false
+            requestFocus()
+            setOnQueryTextListener(this@SearchActivity)
         }
 
         return true
     }
 
     override fun onNewIntent(intent: Intent?) {
+        setIntent(intent)
         super.onNewIntent(intent)
         handleIntent(intent!!)
-    }
-    private fun handleIntent(intent: Intent) {
-
-        if (Intent.ACTION_SEARCH == intent.action) {
-            val query = intent.getStringExtra(SearchManager.QUERY)
-            //use the query to search your data somehow
-            Toast.makeText(this, query, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun handleSearch(query: String?, clearSearch: Boolean = false){
-        if (clearSearch){
-            PAGE = 1
-            animeAdapter.clearAnimes()
-
-        }
-
-        if (query != null && query.length > 2){
-            animeViewModel!!.searchAnime(q = query, page = PAGE)
-
-
-
-        }
-    }
-
-
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        this.query = query!!
-
-        handleSearch(query = query,  clearSearch = true)
-        return true
-    }
-
-    override fun onQueryTextChange(query: String?): Boolean {
-        this.query = query!!
-
-        handleSearch(query = query,  clearSearch = true)
-        return true
-    }
-
-    override fun onScrollChange(
-        v: NestedScrollView?,
-        scrollX: Int,
-        scrollY: Int,
-        oldScrollX: Int,
-        oldScrollY: Int
-    ) {
-        if (scrollY == v!!.getChildAt(0).measuredHeight - v.measuredHeight){
-            PAGE++
-           handleSearch(query)
-
-        }
     }
 
     override fun onStart() {
         super.onStart()
         scrollView.setOnScrollChangeListener(this)
-
     }
 
+    /*==============================================================================================
+    CUSTOM METHODS
+    ==============================================================================================*/
+
+    private fun handleIntent(intent: Intent) {
+
+        if (Intent.ACTION_SEARCH == intent.action) {
+            val query = intent.getStringExtra(SearchManager.QUERY)
+            //use the query to search your data somehow
+
+            Toast.makeText(this, query, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun handleSearch(query: String?, clearSearch: Boolean = false){
+
+        if(clearSearch) {
+            PAGE = 1
+            animeAdapter.clearAnimes()
+        }
+
+        if(query != null && query.length > 2){
+            animeViewModel!!.searchAnime(q = query, page = PAGE)
+        }
+    }
+
+    /*==============================================================================================
+    OnQueryTextListener
+    ==============================================================================================*/
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        this.query = query!!
+        handleSearch(query = query, clearSearch = true)
+        return true
+    }
+
+    override fun onQueryTextChange(query: String?): Boolean {
+        this.query = query!!
+        handleSearch(query = query, clearSearch = true)
+        return true
+    }
+
+    /*==============================================================================================
+    OnScrollChangeListener
+    ==============================================================================================*/
+
+    override fun onScrollChange(v: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
+        if(scrollY == v!!.getChildAt(0).measuredHeight - v.measuredHeight ) {
+            PAGE++
+            handleSearch(query = query)
+        }
+    }
 }

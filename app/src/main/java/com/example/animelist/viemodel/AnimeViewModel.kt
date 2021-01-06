@@ -1,18 +1,21 @@
 package com.example.animelist.viemodel
 
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.airbnb.lottie.LottieAnimationView
 import com.example.animelist.model.Anime
 import com.example.animelist.model.Search
 import com.example.animelist.network.AnimeRetrofitClient
 import com.example.animelist.network.enums.AnimeOrder
 import com.example.animelist.network.enums.AnimeSort
+import com.example.animelist.network.model.ApiError
 import com.example.animelist.network.utils.AnimeFilterAndSort
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.lang.Exception
-import java.nio.ByteOrder
 
 enum class RequestStatus {ERROR, LOADING, DONE}
 
@@ -28,37 +31,54 @@ class AnimeViewModel : ViewModel(){
     private val _search = MutableLiveData<Search>()
     val search : LiveData<Search> get() = _search
 
-    fun findAnimeByid(id: Int){
-        viewModelScope.launch (Dispatchers.IO){
-            val anime = AnimeRetrofitClient.retrofitClient.findAnimeByid(id = id)
-            anime?.let {
-                withContext(Dispatchers.Main){
-                    _anime.value = it
-                }
-            }
-        }
-        //coroutineScope.launch {
-//            val animeDeferret = AnimeRetrofitClient.retrofitClient.findAnimeByid(id = id)
-//            try {
-//                val anime = animeDeferret.await()
-//                _anime.value = anime
-//
-//            }catch (e: Exception){}
-        }
-    fun searchAnime(q:  String = "", page: Int, limit: Int = 20, order_by: String = AnimeFilterAndSort.animeOrder[AnimeOrder.TITLE]!!, sort: String = AnimeFilterAndSort.animeSort[AnimeSort.ASC]!!){
-        viewModelScope.launch (Dispatchers.IO){
-            val search = AnimeRetrofitClient.retrofitClient.searchAnime( q= q, page=page, limit = limit,order_by = order_by,sort = sort)
-            search?.let {
-                withContext(Dispatchers.Main){
-                    _search.value = it
-                }
+    private val _error = MutableLiveData<ApiError>()
+    val error: LiveData<ApiError> get() = _error
 
+    private val _loading = MutableLiveData<Boolean>()
+    val loading: LiveData<Boolean> get() = _loading
+
+    fun findAnimeByid(id: Int){
+
+        _loading.value = true
+
+
+        viewModelScope.launch (Dispatchers.IO){
+            val either = AnimeRetrofitClient.retrofitClient.findAnimeByid(id = id)
+
+
+            withContext(Dispatchers.Main){
+                _loading.value = false
+                either.fold(
+                        {
+                            _error.value = it
+                        },
+                        {
+                            _anime.value = it
+                        }
+                )
             }
         }
     }
 
-//    override fun onCleared() {
-//        super.onCleared()
-//        viewModelJob.cancel()
-//    }
+    fun searchAnime(q: String = "", page: Int, limit: Int = 20, orderBy: String = AnimeFilterAndSort.animeOrder[AnimeOrder.TITLE]!!, sort: String = AnimeFilterAndSort.animeSort[AnimeSort.ASC]!!){
+        _loading.value = true
+        Timber.i("Buscando anime")
+        viewModelScope.launch (Dispatchers.IO){
+            val either = AnimeRetrofitClient.retrofitClient.searchAnime( q = q, page = page, limit = limit, orderBy = orderBy, sort = sort)
+
+            withContext(Dispatchers.Main){
+                _loading.value = false
+                either.fold(
+                        {
+                            _error.value = it
+                        },
+                        {
+                            _search.value = it
+                        }
+                )
+            }
+        }
+    }
+
+
 }
