@@ -1,5 +1,7 @@
 package com.example.animelist.model
 
+import java.io.Serializable
+
 data class Anime(
 
     val mal_id: Int,
@@ -13,7 +15,7 @@ data class Anime(
     val title: String,
 
 
-    )
+    ): Serializable
 
 
 

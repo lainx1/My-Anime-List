@@ -73,4 +73,12 @@ dependencies {
 
     //Lottie
     implementation "com.airbnb.android:lottie:$lottieVersion"
+
+    //Cordinator
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$coordinator"
+
+    //Material
+    implementation "com.google.android.material:material:$material"
+
+
 }

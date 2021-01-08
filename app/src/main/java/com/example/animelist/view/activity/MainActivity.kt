@@ -11,12 +11,14 @@ import android.widget.SearchView
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.animelist.R
+import com.example.animelist.model.Anime
 import com.example.animelist.viemodel.AnimeViewModel
 import com.example.animelist.view.AnimeAdapter
+import com.example.animelist.view.`interface`.AnimeInterface
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.loader.*
 
-class MainActivity : BaseActivity(), NestedScrollView.OnScrollChangeListener {
+class MainActivity : BaseActivity(), NestedScrollView.OnScrollChangeListener, AnimeInterface {
 
     private var PAGE = 1
     private var animeViewModel: AnimeViewModel? = null
@@ -30,7 +32,10 @@ class MainActivity : BaseActivity(), NestedScrollView.OnScrollChangeListener {
 
         animeViewModel = AnimeViewModel()
 
-        val animeAdapter = AnimeAdapter(mutableListOf())
+        val animeAdapter = AnimeAdapter(
+            animes = mutableListOf(),
+            animeInterface = this
+        )
         with(animeListRv){
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(this@MainActivity, 2, GridLayoutManager.VERTICAL, false)
@@ -55,6 +60,7 @@ class MainActivity : BaseActivity(), NestedScrollView.OnScrollChangeListener {
     override fun onStart() {
         super.onStart()
         scrollView.setOnScrollChangeListener(this)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -82,6 +88,15 @@ class MainActivity : BaseActivity(), NestedScrollView.OnScrollChangeListener {
             PAGE++
             animeViewModel!!.searchAnime(page = PAGE)
         }
+    }
+
+    override fun OnClickAnime(anime: Anime) {
+        val intent = Intent(this, AnimeDetailActivity::class.java)
+
+        intent.putExtra("anime", anime)
+
+        startActivity(intent)
+
     }
 
 }
