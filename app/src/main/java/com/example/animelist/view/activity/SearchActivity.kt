@@ -3,7 +3,7 @@ package com.example.animelist.view.activity
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+
 import android.os.Bundle
 import android.view.Menu
 import android.widget.SearchView
@@ -11,18 +11,29 @@ import android.widget.Toast
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.animelist.R
+import com.example.animelist.model.Anime
+import com.example.animelist.network.model.HttpErrorResponse
+import com.example.animelist.network.model.NetworkError
+import com.example.animelist.network.model.UnknownApiError
+import com.example.animelist.network.model.`interface`.HandleErrors
+
 import com.example.animelist.viemodel.AnimeViewModel
 import com.example.animelist.view.AnimeAdapter
+import com.example.animelist.view.interfaces.AnimeInterface
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.activity_search.scrollView
+import kotlinx.android.synthetic.main.loader.*
 
-class SearchActivity : AppCompatActivity(), SearchView.OnQueryTextListener, NestedScrollView.OnScrollChangeListener {
+class SearchActivity : BaseActivity(), SearchView.OnQueryTextListener, NestedScrollView.OnScrollChangeListener, AnimeInterface {
 
     private var PAGE = 1
     private var animeViewModel: AnimeViewModel? = null
     private var query = ""
-    private val animeAdapter = AnimeAdapter(animes =  mutableListOf())
+    private val animeAdapter = AnimeAdapter(
+        animes =  mutableListOf(),
+        animeInterface = this
+    )
 
     /*==============================================================================================
     ACTIVITY METHODS
@@ -46,7 +57,13 @@ class SearchActivity : AppCompatActivity(), SearchView.OnQueryTextListener, Nest
 
 
         animeViewModel!!.error.observe(this, {
-            Toast.makeText(this@SearchActivity, "Hubo un error $it-", Toast.LENGTH_SHORT).show()
+            handleApiError(
+                    error = it
+            )
+        })
+
+        animeViewModel!!.loading.observe(this, {
+            showLoader(loader = loader, loading =  it)
         })
 
         handleIntent(intent)
@@ -132,5 +149,13 @@ class SearchActivity : AppCompatActivity(), SearchView.OnQueryTextListener, Nest
             PAGE++
             handleSearch(query = query)
         }
+    }
+
+    override fun onClickAnime(anime: Anime) {
+        val intent = Intent(this, AnimeDetailActivity::class.java)
+
+        intent.putExtra("anime", anime)
+
+        startActivity(intent)
     }
 }

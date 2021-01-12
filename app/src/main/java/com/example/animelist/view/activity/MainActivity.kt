@@ -1,21 +1,20 @@
 package com.example.animelist.view.activity
 
-import android.app.SearchManager
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
-import android.widget.SearchView
+import android.widget.Toast
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.animelist.R
+import com.example.animelist.model.Anime
 import com.example.animelist.viemodel.AnimeViewModel
 import com.example.animelist.view.AnimeAdapter
+import com.example.animelist.view.interfaces.AnimeInterface
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.loader.*
 
-class MainActivity : AppCompatActivity(), NestedScrollView.OnScrollChangeListener {
+class MainActivity : BaseActivity(), NestedScrollView.OnScrollChangeListener, AnimeInterface {
 
     private var PAGE = 1
     private var animeViewModel: AnimeViewModel? = null
@@ -29,7 +28,11 @@ class MainActivity : AppCompatActivity(), NestedScrollView.OnScrollChangeListene
 
         animeViewModel = AnimeViewModel()
 
-        val animeAdapter = AnimeAdapter(mutableListOf())
+        val animeAdapter = AnimeAdapter(
+            animes = mutableListOf(),
+            animeInterface = this
+        )
+
         with(animeListRv){
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(this@MainActivity, 2, GridLayoutManager.VERTICAL, false)
@@ -38,6 +41,10 @@ class MainActivity : AppCompatActivity(), NestedScrollView.OnScrollChangeListene
 
         animeViewModel!!.search.observe(this, {
             animeAdapter.addAnimes(it.results)
+        })
+
+        animeViewModel!!.loading.observe(this, {
+            showLoader(loader = loader, loading =  it)
         })
 
         animeViewModel!!.searchAnime(page = PAGE)
@@ -73,6 +80,15 @@ class MainActivity : AppCompatActivity(), NestedScrollView.OnScrollChangeListene
             PAGE++
             animeViewModel!!.searchAnime(page = PAGE)
         }
+    }
+
+    override fun onClickAnime(anime: Anime) {
+
+        val intent = Intent(this, AnimeDetailActivity::class.java)
+
+        intent.putExtra("anime", anime)
+
+        startActivity(intent)
     }
 
 }

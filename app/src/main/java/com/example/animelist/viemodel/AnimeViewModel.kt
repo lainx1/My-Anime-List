@@ -1,9 +1,11 @@
 package com.example.animelist.viemodel
 
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.airbnb.lottie.LottieAnimationView
 import com.example.animelist.model.Anime
 import com.example.animelist.model.Search
 import com.example.animelist.network.AnimeRetrofitClient
@@ -32,13 +34,19 @@ class AnimeViewModel : ViewModel(){
     private val _error = MutableLiveData<ApiError>()
     val error: LiveData<ApiError> get() = _error
 
+    private val _loading = MutableLiveData<Boolean>()
+    val loading : LiveData<Boolean> get() = _loading
+
     fun findAnimeByid(id: Int){
 
+        _loading.value = true
 
         viewModelScope.launch (Dispatchers.IO){
             val either = AnimeRetrofitClient.retrofitClient.findAnimeByid(id = id)
-
             withContext(Dispatchers.Main){
+
+                _loading.value = false
+
                 either.fold(
                         {
                             _error.value = it
@@ -52,10 +60,16 @@ class AnimeViewModel : ViewModel(){
     }
 
     fun searchAnime(q: String = "", page: Int, limit: Int = 20, orderBy: String = AnimeFilterAndSort.animeOrder[AnimeOrder.TITLE]!!, sort: String = AnimeFilterAndSort.animeSort[AnimeSort.ASC]!!){
-        Timber.i("Buscando anime")
+
+        _loading.value = true
+
         viewModelScope.launch (Dispatchers.IO){
             val either = AnimeRetrofitClient.retrofitClient.searchAnime( q = q, page = page, limit = limit, orderBy = orderBy, sort = sort)
+
             withContext(Dispatchers.Main){
+
+                _loading.value = false
+
                 either.fold(
                         {
                             _error.value = it
@@ -67,9 +81,4 @@ class AnimeViewModel : ViewModel(){
             }
         }
     }
-
-//    override fun onCleared() {
-//        super.onCleared()
-//        viewModelJob.cancel()
-//    }
 }
