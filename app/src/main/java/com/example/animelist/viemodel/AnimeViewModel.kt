@@ -35,19 +35,18 @@ class AnimeViewModel : ViewModel(){
     val error: LiveData<ApiError> get() = _error
 
     private val _loading = MutableLiveData<Boolean>()
-    val loading: LiveData<Boolean> get() = _loading
+    val loading : LiveData<Boolean> get() = _loading
 
     fun findAnimeByid(id: Int){
 
         _loading.value = true
 
-
         viewModelScope.launch (Dispatchers.IO){
             val either = AnimeRetrofitClient.retrofitClient.findAnimeByid(id = id)
-
-
             withContext(Dispatchers.Main){
+
                 _loading.value = false
+
                 either.fold(
                         {
                             _error.value = it
@@ -61,13 +60,16 @@ class AnimeViewModel : ViewModel(){
     }
 
     fun searchAnime(q: String = "", page: Int, limit: Int = 20, orderBy: String = AnimeFilterAndSort.animeOrder[AnimeOrder.TITLE]!!, sort: String = AnimeFilterAndSort.animeSort[AnimeSort.ASC]!!){
+
         _loading.value = true
-        Timber.i("Buscando anime")
+
         viewModelScope.launch (Dispatchers.IO){
             val either = AnimeRetrofitClient.retrofitClient.searchAnime( q = q, page = page, limit = limit, orderBy = orderBy, sort = sort)
 
             withContext(Dispatchers.Main){
+
                 _loading.value = false
+
                 either.fold(
                         {
                             _error.value = it
@@ -79,6 +81,4 @@ class AnimeViewModel : ViewModel(){
             }
         }
     }
-
-
 }

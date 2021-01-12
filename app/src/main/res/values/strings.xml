@@ -5,4 +5,9 @@
     <string name="search">Buscar</string>
     <string name="search_hint">Ingresa el nombre del anime</string>
 
+    <string-array name="anime_status">
+        <item>Al aire</item>
+        <item>Finalizado</item>
+    </string-array>
+
 </resources>

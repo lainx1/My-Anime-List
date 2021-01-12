@@ -67,6 +67,14 @@ dependencies {
     //Logging
     implementation "com.jakewharton.timber:timber:$timber_version"
 
+    //Lottie
+    implementation "com.airbnb.android:lottie:$lottieVersion"
+
+    //Cordinator
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$coordinator"
+
+    implementation "com.google.android.material:material:$material"
+
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
